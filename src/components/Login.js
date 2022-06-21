@@ -47,7 +47,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export const Login = () => {
+export const Login = ({loggedIn,setloggedIn}) => {
     const classes = useStyles();
     const navigate = useNavigate();
 
@@ -70,6 +70,8 @@ export const Login = () => {
             })
             const response = await res.json()
             if(response.token){
+                localStorage.setItem("user",JSON.stringify(response))
+                setloggedIn(true)
                 navigate("/home")
             }
         } catch (error) {

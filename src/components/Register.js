@@ -48,7 +48,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-export const Register = () => {
+export const Register = ({loggedIn,setloggedIn}) => {
     const classes = useStyles();
     const navigate = useNavigate();
 
@@ -71,6 +71,8 @@ export const Register = () => {
             })
             const response = await res.json()
             if(response.token){
+                localStorage.setItem("user",JSON.stringify(response))
+                setloggedIn(true)
                 navigate("/home")
             }
         } catch (error) {
