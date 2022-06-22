@@ -13,6 +13,7 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import { useNavigate } from "react-router-dom";
+import Error from './Error';
 
 // function Copyright() {
 //     return (
@@ -47,101 +48,104 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export const Login = ({loggedIn,setloggedIn}) => {
+export const Login = ({ loggedIn, setloggedIn }) => {
     const classes = useStyles();
     const navigate = useNavigate();
 
-    const [loginData, setloginData] = useState({email:"",password:""})
+    const [loginData, setloginData] = useState({ email: "", password: "" })
 
     const handleChange = (e) => {
-        const {name,value} = e.target
-        setloginData({...loginData,[name]:value})
+        const { name, value } = e.target
+        setloginData({ ...loginData, [name]: value })
     }
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/auth/login`,{
+            const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/auth/login`, {
                 method: 'POST',
                 body: JSON.stringify(loginData),
-                headers:{
+                headers: {
                     'Content-Type': 'application/json'
                 }
             })
             const response = await res.json()
-            if(response.token){
-                localStorage.setItem("user",JSON.stringify(response))
+            if (response.token) {
+                localStorage.setItem("user", JSON.stringify(response))
                 setloggedIn(true)
                 navigate("/home")
             }
         } catch (error) {
             console.error(error);
-        } 
+        }
     }
 
     return (
         <Container component="main" maxWidth="xs">
-            <CssBaseline />
-            <div className={classes.paper}>
-                <Avatar className={classes.avatar}>
-                    <LockOutlinedIcon />
-                </Avatar>
-                <Typography component="h1" variant="h5">
-                    Sign in
-                </Typography>
-                <form className={classes.form}>
-                    <TextField
-                        variant="outlined"
-                        margin="normal"
-                        required
-                        fullWidth
-                        id="email"
-                        label="Email Address"
-                        name="email"
-                        autoComplete="email"
-                        onChange={(e) => handleChange(e)}
-                        autoFocus
-                    />
-                    <TextField
-                        variant="outlined"
-                        margin="normal"
-                        required
-                        fullWidth
-                        name="password"
-                        label="Password"
-                        type="password"
-                        id="password"
-                        onChange={(e) => handleChange(e)}
-                        autoComplete="current-password"
-                    />
-                    {/* <FormControlLabel
+            {loggedIn && <Error message={"Already Logged In"}/>}
+            {!loggedIn && <>
+                <CssBaseline />
+                <div className={classes.paper}>
+                    <Avatar className={classes.avatar}>
+                        <LockOutlinedIcon />
+                    </Avatar>
+                    <Typography component="h1" variant="h5">
+                        Sign in
+                    </Typography>
+                    <form className={classes.form}>
+                        <TextField
+                            variant="outlined"
+                            margin="normal"
+                            required
+                            fullWidth
+                            id="email"
+                            label="Email Address"
+                            name="email"
+                            autoComplete="email"
+                            onChange={(e) => handleChange(e)}
+                            autoFocus
+                        />
+                        <TextField
+                            variant="outlined"
+                            margin="normal"
+                            required
+                            fullWidth
+                            name="password"
+                            label="Password"
+                            type="password"
+                            id="password"
+                            onChange={(e) => handleChange(e)}
+                            autoComplete="current-password"
+                        />
+                        {/* <FormControlLabel
                         control={<Checkbox value="remember" color="primary" />}
                         label="Remember me"
                     /> */}
-                    <Button
-                        type="submit"
-                        fullWidth
-                        variant="contained"
-                        color="primary"
-                        className={classes.submit}
-                        onClick={handleSubmit}
-                    >
-                        Sign In
-                    </Button>
-                    <Grid container>
-                        <Grid item xs>
-                            <Link href="#" variant="body2">
-                                Forgot password?
-                            </Link>
+                        <Button
+                            type="submit"
+                            fullWidth
+                            variant="contained"
+                            color="primary"
+                            className={classes.submit}
+                            onClick={handleSubmit}
+                        >
+                            Sign In
+                        </Button>
+                        <Grid container>
+                            <Grid item xs>
+                                <Link href="#" variant="body2">
+                                    Forgot password?
+                                </Link>
+                            </Grid>
+                            <Grid item>
+                                <Link onClick={() => navigate("/register")} style={{ cursor: "pointer" }} variant="body2">
+                                    {"Don't have an account? Sign Up"}
+                                </Link>
+                            </Grid>
                         </Grid>
-                        <Grid item>
-                            <Link onClick={() => navigate("/register")} style={{cursor:"pointer"}} variant="body2">
-                                {"Don't have an account? Sign Up"}
-                            </Link>
-                        </Grid>
-                    </Grid>
-                </form>
-            </div>
+                    </form>
+                </div>
+            </>}
             {/* <Box mt={8}>
                 <Copyright />
             </Box> */}

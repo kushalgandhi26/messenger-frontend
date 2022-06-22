@@ -13,6 +13,7 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import { useNavigate } from "react-router-dom";
+import Error from './Error';
 
 // function Copyright() {
 //     return (
@@ -82,6 +83,8 @@ export const Register = ({loggedIn,setloggedIn}) => {
 
     return (
         <Container component="main" maxWidth="xs">
+            {loggedIn && <Error message={"Already Registered"}/>}
+            {!loggedIn && <>
             <CssBaseline />
             <div className={classes.paper}>
                 <Avatar className={classes.avatar}>
@@ -168,6 +171,7 @@ export const Register = ({loggedIn,setloggedIn}) => {
                     </Grid>
                 </form>
             </div>
+            </>}
             {/* <Box mt={5}>
                 <Copyright />
             </Box> */}

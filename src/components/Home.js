@@ -1,4 +1,4 @@
-import React, { useEffect,useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
 import { makeStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -11,8 +11,8 @@ import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
 import IconButton from '@material-ui/core/IconButton';
 import Badge from '@material-ui/core/Badge';
-import Container from '@material-ui/core/Container';
-import Grid from '@material-ui/core/Grid';
+// import Container from '@material-ui/core/Container';
+// import Grid from '@material-ui/core/Grid';
 // import Paper from '@material-ui/core/Paper';
 // import Link from '@material-ui/core/Link';
 import MenuIcon from '@material-ui/icons/Menu';
@@ -26,6 +26,13 @@ import Popper from '@material-ui/core/Popper';
 import MenuItem from '@material-ui/core/MenuItem';
 import MenuList from '@material-ui/core/MenuList';
 import { useNavigate } from 'react-router-dom';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import ListItemText from '@material-ui/core/ListItemText';
+// import DashboardIcon from '@material-ui/icons/Dashboard';
+import Error from './Error';
+import Welcome from './Welcome';
+import Chatcontainer from './Chatcontainer';
 // import { mainListItems, secondaryListItems } from './listItems';
 // import Chart from './Chart';
 // import Deposits from './Deposits';
@@ -123,22 +130,58 @@ const useStyles = makeStyles((theme) => ({
   fixedHeight: {
     height: 240,
   },
+
+  small: {
+    width: theme.spacing(4),
+    height: theme.spacing(4),
+  },
 }));
 
 
-export default function Home({loggedIn,setloggedIn}) {
-  const [user, setuser] = useState({name:"",email:""})
+export default function Home({ loggedIn, setloggedIn }) {
+  const [allusers, setallusers] = useState([])
+  const [user, setuser] = useState({ _id: "", name: "", email: "", token: "" })
+  const [currentuser, setcurrentuser] = useState(undefined)
+  const [click, setclick] = useState(true)
+  const [title, settitle] = useState("Chats")
+
   useEffect(() => {
     if (localStorage.getItem("user")) {
       const user_data = JSON.parse(localStorage.getItem("user"))
-      setuser({name:user_data.user.name,email:user_data.user.email})
+      setuser({ _id: user_data.user._id, name: user_data.user.name, email: user_data.user.email, token: user_data.token })
     }
     // eslint-disable-next-line
   }, [])
 
+  useEffect(() => {
+    fetchUsers()
+    // eslint-disable-next-line
+  }, [user])
+
+  const fetchUsers = async () => {
+    try {
+      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/auth/getUsers/${user._id}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'token': user.token
+        }
+      })
+      const response = await res.json();
+      setallusers(response)
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  const selectUser = (user) => {
+    setcurrentuser(user)
+    setclick(false)
+    settitle(user.name)
+  }
 
   const classes = useStyles();
-  const [openContacts, setOpenContacts] = React.useState(true);
+  const [openContacts, setOpenContacts] = useState(true);
   const handleDrawerOpen = () => {
     setOpenContacts(true);
   };
@@ -150,7 +193,7 @@ export default function Home({loggedIn,setloggedIn}) {
 
   const navigate = useNavigate()
   const handleLogout = () => {
-    if(localStorage.getItem("user")){
+    if (localStorage.getItem("user")) {
       localStorage.removeItem("user")
       setloggedIn(false)
       setOpen(false);
@@ -182,8 +225,8 @@ export default function Home({loggedIn,setloggedIn}) {
   }
 
   // return focus to the button when we transitioned from !open -> open
-  const prevOpen = React.useRef(open);
-  React.useEffect(() => {
+  const prevOpen = useRef(open);
+  useEffect(() => {
     if (prevOpen.current === true && open === false) {
       anchorRef.current.focus();
     }
@@ -193,95 +236,90 @@ export default function Home({loggedIn,setloggedIn}) {
 
   return (
     <div className={classes.root}>
-      <CssBaseline />
-      <AppBar position="absolute" className={clsx(classes.appBar, openContacts && classes.appBarShift)}>
-        <Toolbar className={classes.toolbar}>
-          <IconButton
-            edge="start"
-            color="inherit"
-            aria-label="open drawer"
-            onClick={handleDrawerOpen}
-            className={clsx(classes.menuButton, openContacts && classes.menuButtonHidden)}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.title}>
-            Chats
-          </Typography>
-          <IconButton color="inherit">
-            <Badge badgeContent={4} color="secondary">
-              <NotificationsIcon />
-            </Badge>
-          </IconButton>
-          <Avatar alt={user.name} src="/static/images/avatar/1.jpg" style={{ marginLeft: "20px",cursor:"pointer"}} className={classes.large} ref={anchorRef}
-            aria-controls={open ? 'menu-list-grow' : undefined}
-            aria-haspopup="true"
-            onClick={handleToggle} />
-          <Popper open={open} anchorEl={anchorRef.current} role={undefined} transition disablePortal>
-            {({ TransitionProps, placement }) => (
-              <Grow
-                {...TransitionProps}
-                style={{ transformOrigin: placement === 'bottom' ? 'center top' : 'center bottom' }}
+      {!loggedIn && <Error message={"Please Login"} />}
+      {
+        loggedIn && <>
+          <CssBaseline />
+          <AppBar position="absolute" className={clsx(classes.appBar, openContacts && classes.appBarShift)}>
+            <Toolbar className={classes.toolbar}>
+              <IconButton
+                edge="start"
+                color="inherit"
+                aria-label="open drawer"
+                onClick={handleDrawerOpen}
+                className={clsx(classes.menuButton, openContacts && classes.menuButtonHidden)}
               >
-                <Paper>
-                  <ClickAwayListener onClickAway={handleClose}>
-                    <MenuList autoFocusItem={open} id="menu-list-grow" onKeyDown={handleListKeyDown}>
-                      {/* <MenuItem onClick={handleClose}>Profile</MenuItem>
+                <MenuIcon />
+              </IconButton>
+              <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.title}>
+                {title}
+              </Typography>
+              <IconButton color="inherit">
+                <Badge badgeContent={4} color="secondary">
+                  <NotificationsIcon />
+                </Badge>
+              </IconButton>
+              <Avatar alt={user.name} src="/static/images/avatar/1.jpg" style={{ marginLeft: "20px", cursor: "pointer" }} className={classes.large} ref={anchorRef}
+                aria-controls={open ? 'menu-list-grow' : undefined}
+                aria-haspopup="true"
+                onClick={handleToggle} />
+              <Popper open={open} anchorEl={anchorRef.current} role={undefined} transition disablePortal>
+                {({ TransitionProps, placement }) => (
+                  <Grow
+                    {...TransitionProps}
+                    style={{ transformOrigin: placement === 'bottom' ? 'center top' : 'center bottom' }}
+                  >
+                    <Paper>
+                      <ClickAwayListener onClickAway={handleClose}>
+                        <MenuList autoFocusItem={open} id="menu-list-grow" onKeyDown={handleListKeyDown}>
+                          {/* <MenuItem onClick={handleClose}>Profile</MenuItem>
                       <MenuItem onClick={handleClose}>My account</MenuItem> */}
-                      <MenuItem onClick={handleLogout}>Logout</MenuItem>
-                    </MenuList>
-                  </ClickAwayListener>
-                </Paper>
-              </Grow>
-            )}
-          </Popper>
-        </Toolbar>
-      </AppBar>
-      <Drawer
-        variant="permanent"
-        classes={{
-          paper: clsx(classes.drawerPaper, !openContacts && classes.drawerPaperClose),
-        }}
-        open={openContacts}
-      >
-        <div className={classes.toolbarIcon}>
-          <IconButton onClick={handleDrawerClose}>
-            <ChevronLeftIcon />
-          </IconButton>
-        </div>
-        <Divider />
-        {/* <List>{mainListItems}</List>
+                          <MenuItem onClick={handleLogout}>Logout</MenuItem>
+                        </MenuList>
+                      </ClickAwayListener>
+                    </Paper>
+                  </Grow>
+                )}
+              </Popper>
+            </Toolbar>
+          </AppBar>
+          <Drawer
+            variant="permanent"
+            classes={{
+              paper: clsx(classes.drawerPaper, !openContacts && classes.drawerPaperClose),
+            }}
+            open={openContacts}
+          >
+            <div className={classes.toolbarIcon}>
+              <IconButton onClick={handleDrawerClose}>
+                <ChevronLeftIcon />
+              </IconButton>
+            </div>
+            <Divider />
+            {allusers.map((element) => {
+              return (
+                <ListItem onClick={() => selectUser(element)} key={element._id} button>
+                  <ListItemIcon>
+                    <Avatar alt={element.name} src="/static/images/avatar/1.jpg" className={classes.small} />
+                  </ListItemIcon>
+                  <ListItemText primary={element.name} />
+                </ListItem>
+              )
+            })}
+
+            {/* <List>{mainListItems}</List>
         <Divider />
         <List>{secondaryListItems}</List> */}
-      </Drawer>
-      <main className={classes.content}>
-        <div className={classes.appBarSpacer} />
-        <Container maxWidth="lg" className={classes.container}>
-          <Grid container spacing={3}>
-            {/* Chart */}
-            {/* <Grid item xs={12} md={8} lg={9}>
-              <Paper className={fixedHeightPaper}>
-                <Chart />
-              </Paper>
-            </Grid> */}
-            {/* Recent Deposits */}
-            {/* <Grid item xs={12} md={4} lg={3}>
-              <Paper className={fixedHeightPaper}>
-                <Deposits />
-              </Paper>
-            </Grid> */}
-            {/* Recent Orders */}
-            {/* <Grid item xs={12}>
-              <Paper className={classes.paper}>
-                <Orders />
-              </Paper>
-            </Grid> */}
-          </Grid>
-          {/* <Box pt={4}>
-            <Copyright />
-          </Box> */}
-        </Container>
-      </main>
-    </div>
+          </Drawer>
+          <main className={classes.content}>
+            <div className={classes.appBarSpacer} />
+            {/* <Container maxWidth="lg" className={classes.container}> */}
+            {click && <Welcome />}
+            {!click && <Chatcontainer user={currentuser}/>}
+            {/* </Container> */}
+          </main>
+        </>
+      }
+    </div >
   );
 }

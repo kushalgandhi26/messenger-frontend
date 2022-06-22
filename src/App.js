@@ -23,9 +23,9 @@ function App() {
 
   return (
     <Routes>
-      {!loggedIn && <Route path="/" element={<Login loggedIn={loggedIn} setloggedIn={setloggedIn} />} />}
-      {!loggedIn && <Route path="/register" element={<Register loggedIn={loggedIn} setloggedIn={setloggedIn} />} />}
-      {loggedIn && <Route path="/home" element={<Home loggedIn={loggedIn} setloggedIn={setloggedIn} />} />}
+      <Route path="/" element={<Login loggedIn={loggedIn} setloggedIn={setloggedIn} />} />
+      <Route path="/register" element={<Register loggedIn={loggedIn} setloggedIn={setloggedIn} />} />
+      <Route path="/home" element={<Home loggedIn={loggedIn} setloggedIn={setloggedIn}/>} />
     </Routes>
   );
 }
