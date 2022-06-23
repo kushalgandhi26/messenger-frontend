@@ -315,7 +315,7 @@ export default function Home({ loggedIn, setloggedIn }) {
             <div className={classes.appBarSpacer} />
             {/* <Container maxWidth="lg" className={classes.container}> */}
             {click && <Welcome />}
-            {!click && <Chatcontainer user={currentuser}/>}
+            {!click && <Chatcontainer user={user} selectedUser={currentuser}/>}
             {/* </Container> */}
           </main>
         </>

@@ -1,8 +1,14 @@
 import React from 'react'
+import ChatInput from './ChatInput'
 
-function Chatcontainer({user}) {
+
+function Chatcontainer({selectedUser,user}) {
+  
   return (
-    <div>{user.name}</div>
+    <div>
+      <ChatInput user={user} selectedUser={selectedUser}/>
+    </div>
+    
   )
 }
 
