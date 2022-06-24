@@ -33,6 +33,8 @@ import ListItemText from '@material-ui/core/ListItemText';
 import Error from './Error';
 import Welcome from './Welcome';
 import Chatcontainer from './Chatcontainer';
+import {io} from "socket.io-client"
+
 // import { mainListItems, secondaryListItems } from './listItems';
 // import Chart from './Chart';
 // import Deposits from './Deposits';
@@ -145,6 +147,8 @@ export default function Home({ loggedIn, setloggedIn }) {
   const [click, setclick] = useState(true)
   const [title, settitle] = useState("Chats")
 
+  const socket = useRef()
+
   useEffect(() => {
     if (localStorage.getItem("user")) {
       const user_data = JSON.parse(localStorage.getItem("user"))
@@ -152,6 +156,14 @@ export default function Home({ loggedIn, setloggedIn }) {
     }
     // eslint-disable-next-line
   }, [])
+
+  useEffect(() => {
+    if(user){
+      socket.current = io(process.env.REACT_APP_BACKEND_URL)
+      socket.current.emit("add-user",user._id)
+    }
+  }, [user])
+  
 
   useEffect(() => {
     fetchUsers()
@@ -315,7 +327,7 @@ export default function Home({ loggedIn, setloggedIn }) {
             <div className={classes.appBarSpacer} />
             {/* <Container maxWidth="lg" className={classes.container}> */}
             {click && <Welcome />}
-            {!click && <Chatcontainer user={user} selectedUser={currentuser}/>}
+            {!click && <Chatcontainer user={user} selectedUser={currentuser} socket={socket}/>}
             {/* </Container> */}
           </main>
         </>

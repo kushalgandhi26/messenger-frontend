@@ -22,7 +22,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-function ChatInput({selectedUser,user}) {
+function ChatInput({selectedUser,user,socket,allmessages,setallmessages}) {
 
     const classes = useStyles();
     const [showEmoji, setshowEmoji] = useState(false)
@@ -46,15 +46,22 @@ function ChatInput({selectedUser,user}) {
         e.preventDefault()
         if(msg.length > 0){
             try {
-                const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/message/send`,{
+                await fetch(`${process.env.REACT_APP_BACKEND_URL}/message/send`,{
                     method:'POST',
                     body:JSON.stringify({from:user._id,to:selectedUser._id,msg:msg}),
                     headers:{
                         'Content-Type': 'application/json'
                     }
                 })
-                const response = await res.json();
-                console.log(response)
+                socket.current.emit("send-msg",{
+                    to: selectedUser._id,
+                    from: user._id,
+                    message:msg
+                })
+                setmsg("")
+                const msgs = [...allmessages]
+                msgs.push({fromSelf:true,message:msg})
+                setallmessages(msgs)
             } catch (error) {
                 console.error(error)
             }
