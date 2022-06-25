@@ -11,7 +11,7 @@ function Chatcontainer({ selectedUser, user, socket }) {
   useEffect(() => {
     fetchAllMessages()
     // eslint-disable-next-line
-  }, [])
+  }, [selectedUser])
 
   useEffect(() => {
     if(socket.current){
