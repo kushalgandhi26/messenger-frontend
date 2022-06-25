@@ -50,7 +50,8 @@ function ChatInput({selectedUser,user,socket,allmessages,setallmessages}) {
                     method:'POST',
                     body:JSON.stringify({from:user._id,to:selectedUser._id,msg:msg}),
                     headers:{
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'token': user.token
                     }
                 })
                 socket.current.emit("send-msg",{

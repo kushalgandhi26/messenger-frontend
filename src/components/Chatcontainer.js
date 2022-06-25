@@ -39,7 +39,8 @@ function Chatcontainer({ selectedUser, user, socket }) {
         method: 'POST',
         body: JSON.stringify({ from: user._id, to: selectedUser._id }),
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'token': user.token
         }
       })
       const response = await res.json()

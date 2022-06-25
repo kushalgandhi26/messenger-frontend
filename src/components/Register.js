@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -10,7 +10,8 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import { useNavigate } from "react-router-dom";
-import Error from './Error';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const useStyles = makeStyles((theme) => ({
     paper: {
@@ -33,42 +34,79 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-export const Register = ({loggedIn,setloggedIn}) => {
+export const Register = ({ loggedIn, setloggedIn }) => {
+
+    useEffect(() => {
+        document.title = "Messenger | Register"
+    }, [])
+
     const classes = useStyles();
     const navigate = useNavigate();
 
-    const [signupData, setsignupData] = useState({name:"",email:"",password:""})
+    const [signupData, setsignupData] = useState({ name: "", email: "", password: "" })
 
     const handleChange = (e) => {
-        const {name,value} = e.target
-        setsignupData({...signupData,[name]:value})
+        const { name, value } = e.target
+        setsignupData({ ...signupData, [name]: value })
     }
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/auth/register`,{
+            const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/auth/register`, {
                 method: 'POST',
                 body: JSON.stringify(signupData),
-                headers:{
+                headers: {
                     'Content-Type': 'application/json'
                 }
             })
             const response = await res.json()
-            if(response.token){
-                localStorage.setItem("user",JSON.stringify(response))
+            if (response.token) {
+                localStorage.setItem("user", JSON.stringify(response))
                 setloggedIn(true)
-                navigate("/home")
+                toast.success("Success", {
+                    position: "top-left",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: 'colored'
+                });
+                setTimeout(() => {
+                    navigate("/home")
+                }, 1000);
+            } else {
+                toast.error(response.message, {
+                    position: "top-left",
+                    autoClose: 3000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: 'colored'
+                });
             }
         } catch (error) {
             console.error(error);
-        } 
+        }
     }
 
     return (
         <Container component="main" maxWidth="xs">
-            {loggedIn && <Error message={"Already Registered"}/>}
-            {!loggedIn && <>
+            <ToastContainer
+                position="top-left"
+                autoClose={5000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+            />
             <CssBaseline />
             <div className={classes.paper}>
                 <Avatar className={classes.avatar}>
@@ -130,14 +168,13 @@ export const Register = ({loggedIn,setloggedIn}) => {
                     </Button>
                     <Grid container justifyContent="flex-end">
                         <Grid item>
-                            <Link onClick={() => navigate("/")} style={{cursor:"pointer"}} variant="body2">
+                            <Link onClick={() => navigate("/")} style={{ cursor: "pointer" }} variant="body2">
                                 Already have an account? Sign in
                             </Link>
                         </Grid>
                     </Grid>
                 </form>
             </div>
-            </>}
         </Container>
     );
 }

@@ -23,7 +23,6 @@ import { useNavigate } from 'react-router-dom';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import Error from './Error';
 import Welcome from './Welcome';
 import Chatcontainer from './Chatcontainer';
 import { io } from "socket.io-client"
@@ -125,6 +124,11 @@ export default function Home({ loggedIn, setloggedIn }) {
   const socket = useRef()
 
   useEffect(() => {
+    document.title = "Chats"
+  }, [])
+
+
+  useEffect(() => {
     if (localStorage.getItem("user")) {
       const user_data = JSON.parse(localStorage.getItem("user"))
       setuser({ _id: user_data.user._id, name: user_data.user.name, email: user_data.user.email, token: user_data.token })
@@ -223,82 +227,77 @@ export default function Home({ loggedIn, setloggedIn }) {
 
   return (
     <div className={classes.root}>
-      {!loggedIn && <Error message={"Please Login"} />}
-      {
-        loggedIn && <>
-          <CssBaseline />
-          <AppBar position="absolute" className={clsx(classes.appBar, openContacts && classes.appBarShift)}>
-            <Toolbar className={classes.toolbar}>
-              <IconButton
-                edge="start"
-                color="inherit"
-                aria-label="open drawer"
-                onClick={handleDrawerOpen}
-                className={clsx(classes.menuButton, openContacts && classes.menuButtonHidden)}
-              >
-                <MenuIcon />
-              </IconButton>
-              <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.title}>
-                {title}
-              </Typography>
-              <IconButton color="inherit">
-                <Badge overlap="rectangular" badgeContent={4} color="secondary">
-                  <NotificationsIcon />
-                </Badge>
-              </IconButton>
-              <Avatar alt={user.name} src="/static/images/avatar/1.jpg" style={{ marginLeft: "20px", cursor: "pointer" }} className={classes.large} ref={anchorRef}
-                aria-controls={open ? 'menu-list-grow' : undefined}
-                aria-haspopup="true"
-                onClick={handleToggle} />
-              <Popper open={open} anchorEl={anchorRef.current} role={undefined} transition disablePortal>
-                {({ TransitionProps, placement }) => (
-                  <Grow
-                    {...TransitionProps}
-                    style={{ transformOrigin: placement === 'bottom' ? 'center top' : 'center bottom' }}
-                  >
-                    <Paper>
-                      <ClickAwayListener onClickAway={handleClose}>
-                        <MenuList autoFocusItem={open} id="menu-list-grow" onKeyDown={handleListKeyDown}>
-                          <MenuItem onClick={handleLogout}>Logout</MenuItem>
-                        </MenuList>
-                      </ClickAwayListener>
-                    </Paper>
-                  </Grow>
-                )}
-              </Popper>
-            </Toolbar>
-          </AppBar>
-          <Drawer
-            variant="permanent"
-            classes={{
-              paper: clsx(classes.drawerPaper, !openContacts && classes.drawerPaperClose),
-            }}
-            open={openContacts}
+      <CssBaseline />
+      <AppBar position="absolute" className={clsx(classes.appBar, openContacts && classes.appBarShift)}>
+        <Toolbar className={classes.toolbar}>
+          <IconButton
+            edge="start"
+            color="inherit"
+            aria-label="open drawer"
+            onClick={handleDrawerOpen}
+            className={clsx(classes.menuButton, openContacts && classes.menuButtonHidden)}
           >
-            <div className={classes.toolbarIcon}>
-              <IconButton onClick={handleDrawerClose}>
-                <ChevronLeftIcon />
-              </IconButton>
-            </div>
-            <Divider />
-            {allusers.map((element) => {
-              return (
-                <ListItem onClick={() => selectUser(element)} key={element._id} button>
-                  <ListItemIcon>
-                    <Avatar alt={element.name} src="/static/images/avatar/1.jpg" className={classes.small} />
-                  </ListItemIcon>
-                  <ListItemText primary={element.name} />
-                </ListItem>
-              )
-            })}
-          </Drawer>
-          <main className={classes.content}>
-            <div className={classes.appBarSpacer} />
-            {click && <Welcome />}
-            {!click && <Chatcontainer user={user} selectedUser={currentuser} socket={socket} />}
-          </main>
-        </>
-      }
+            <MenuIcon />
+          </IconButton>
+          <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.title}>
+            {title}
+          </Typography>
+          <IconButton color="inherit">
+            <Badge overlap="rectangular" badgeContent={4} color="secondary">
+              <NotificationsIcon />
+            </Badge>
+          </IconButton>
+          <Avatar alt={user.name} src="/static/images/avatar/1.jpg" style={{ marginLeft: "20px", cursor: "pointer" }} className={classes.large} ref={anchorRef}
+            aria-controls={open ? 'menu-list-grow' : undefined}
+            aria-haspopup="true"
+            onClick={handleToggle} />
+          <Popper open={open} anchorEl={anchorRef.current} role={undefined} transition disablePortal>
+            {({ TransitionProps, placement }) => (
+              <Grow
+                {...TransitionProps}
+                style={{ transformOrigin: placement === 'bottom' ? 'center top' : 'center bottom' }}
+              >
+                <Paper>
+                  <ClickAwayListener onClickAway={handleClose}>
+                    <MenuList autoFocusItem={open} id="menu-list-grow" onKeyDown={handleListKeyDown}>
+                      <MenuItem onClick={handleLogout}>Logout</MenuItem>
+                    </MenuList>
+                  </ClickAwayListener>
+                </Paper>
+              </Grow>
+            )}
+          </Popper>
+        </Toolbar>
+      </AppBar>
+      <Drawer
+        variant="permanent"
+        classes={{
+          paper: clsx(classes.drawerPaper, !openContacts && classes.drawerPaperClose),
+        }}
+        open={openContacts}
+      >
+        <div className={classes.toolbarIcon}>
+          <IconButton onClick={handleDrawerClose}>
+            <ChevronLeftIcon />
+          </IconButton>
+        </div>
+        <Divider />
+        {allusers.map((element) => {
+          return (
+            <ListItem onClick={() => selectUser(element)} key={element._id} button>
+              <ListItemIcon>
+                <Avatar alt={element.name} src="/static/images/avatar/1.jpg" className={classes.small} />
+              </ListItemIcon>
+              <ListItemText primary={element.name} />
+            </ListItem>
+          )
+        })}
+      </Drawer>
+      <main className={classes.content}>
+        <div className={classes.appBarSpacer} />
+        {click && <Welcome />}
+        {!click && <Chatcontainer user={user} selectedUser={currentuser} socket={socket} />}
+      </main>
     </div >
   );
 }
