@@ -8,10 +8,10 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
 import IconButton from '@material-ui/core/IconButton';
-import Badge from '@material-ui/core/Badge';
+// import Badge from '@material-ui/core/Badge';
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-import NotificationsIcon from '@material-ui/icons/Notifications';
+// import NotificationsIcon from '@material-ui/icons/Notifications';
 import Avatar from '@material-ui/core/Avatar';
 import ClickAwayListener from '@material-ui/core/ClickAwayListener';
 import Grow from '@material-ui/core/Grow';
@@ -161,7 +161,7 @@ export default function Home({ loggedIn, setloggedIn }) {
       const response = await res.json();
       setallusers(response)
     } catch (err) {
-      console.log(err)
+      console.error(err)
     }
   }
 
@@ -239,15 +239,15 @@ export default function Home({ loggedIn, setloggedIn }) {
           >
             <MenuIcon />
           </IconButton>
-          <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.title}>
+          <Typography style={{}} component="h1" variant="h6" color="inherit" noWrap className={classes.title}>
             {title}
           </Typography>
-          <IconButton color="inherit">
+          {/* <IconButton color="inherit">
             <Badge overlap="rectangular" badgeContent={4} color="secondary">
               <NotificationsIcon />
             </Badge>
-          </IconButton>
-          <Avatar alt={user.name} src="/static/images/avatar/1.jpg" style={{ marginLeft: "20px", cursor: "pointer" }} className={classes.large} ref={anchorRef}
+          </IconButton> */}
+          <Avatar alt={user.name} src="/static/images/avatar/1.jpg" style={{ marginLeft: "20px", cursor: "pointer", background: "#3d5489" }} className={classes.large} ref={anchorRef}
             aria-controls={open ? 'menu-list-grow' : undefined}
             aria-haspopup="true"
             onClick={handleToggle} />
@@ -286,7 +286,7 @@ export default function Home({ loggedIn, setloggedIn }) {
           return (
             <ListItem onClick={() => selectUser(element)} key={element._id} button>
               <ListItemIcon>
-                <Avatar alt={element.name} src="/static/images/avatar/1.jpg" className={classes.small} />
+                <Avatar style={{background:"steelblue"}} alt={element.name} src="/static/images/avatar/1.jpg" className={classes.small} />
               </ListItemIcon>
               <ListItemText primary={element.name} />
             </ListItem>

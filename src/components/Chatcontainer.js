@@ -1,9 +1,38 @@
 import React, { useEffect, useRef, useState } from 'react'
 import ChatInput from './ChatInput'
-import {v4 as uuidv4} from "uuid"
+import { v4 as uuidv4 } from "uuid"
+import { makeStyles } from '@material-ui/core/styles';
 
+const useStyles = makeStyles((theme) => ({
+  chatContainer: {
+    display: "flex",
+    flexDirection: "column",
+    minHeight:"85.6%"
+  },
+  selfMessege: {
+    alignSelf: "flex-end",
+    margin: "5px 10px",
+    textAlign: "center",
+    color: "white",
+    backgroundColor: "#2516f5",
+    borderRadius: "8px",
+    padding: "10px",
+    minWidth: "50px",
+  },
+  friendMessege: {
+    alignSelf: "flex-start",
+    margin: "5px 10px",
+    textAlign: "center",
+    color: "white",
+    backgroundColor: "#6b61f2",
+    borderRadius: "8px",
+    padding: "10px",
+    minWidth: "50px",
+  },
+}));
 
 function Chatcontainer({ selectedUser, user, socket }) {
+  const classes = useStyles();
   const [allmessages, setallmessages] = useState([])
   const [arrivalMessage, setarrivalMessage] = useState(null)
 
@@ -14,24 +43,24 @@ function Chatcontainer({ selectedUser, user, socket }) {
   }, [selectedUser])
 
   useEffect(() => {
-    if(socket.current){
-      socket.current.on("msg-receive",(msg) => {
-        setarrivalMessage({from:false,message:msg})
+    if (socket.current) {
+      socket.current.on("msg-receive", (msg) => {
+        setarrivalMessage({ from: false, message: msg })
       })
     }
     // eslint-disable-next-line
   }, [])
-  
+
   useEffect(() => {
-    arrivalMessage && setallmessages((prev) => [...prev,arrivalMessage])
+    arrivalMessage && setallmessages((prev) => [...prev, arrivalMessage])
     // eslint-disable-next-line
   }, [arrivalMessage])
 
   useEffect(() => {
-    scrollRef.current?.scrollIntoView({behaviour:"smooth"})
+    scrollRef.current?.scrollIntoView({ behaviour: "smooth" })
     // eslint-disable-next-line
-  },[allmessages])
-  
+  }, [allmessages])
+
 
   const fetchAllMessages = async () => {
     try {
@@ -51,19 +80,20 @@ function Chatcontainer({ selectedUser, user, socket }) {
   }
 
   return (
-    <div>
-      {allmessages.map((msg) => {
-        if (msg.fromSelf === true)
+    <>
+      <div className={classes.chatContainer}>
+        {allmessages.map((msg) => {
+          if (msg.fromSelf === true)
+            return (
+              <div ref={scrollRef} key={uuidv4()} className={classes.selfMessege}>{msg.message}</div>
+            )
           return (
-            <div ref={scrollRef} key={uuidv4()} style={{ color: "red" }}>{msg.message}</div>
+            <div ref={scrollRef} key={uuidv4()} className={classes.friendMessege}>{msg.message}</div>
           )
-        return (
-          <div ref={scrollRef} key={uuidv4()}>{msg.message}</div>
-        )
-      })}
+        })}
+      </div>
       <ChatInput user={user} selectedUser={selectedUser} socket={socket} allmessages={allmessages} setallmessages={setallmessages} />
-    </div>
-
+    </>
   )
 }
 
