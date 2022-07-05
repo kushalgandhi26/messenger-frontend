@@ -12,6 +12,7 @@ import Container from '@material-ui/core/Container';
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Loading from './Loading';
 
 const useStyles = makeStyles((theme) => ({
     paper: {
@@ -45,12 +46,15 @@ export const Register = ({ loggedIn, setloggedIn }) => {
 
     const [signupData, setsignupData] = useState({ name: "", email: "", password: "" })
 
+    const [visible, setvisible] = useState(false)
+
     const handleChange = (e) => {
         const { name, value } = e.target
         setsignupData({ ...signupData, [name]: value })
     }
 
     const handleSubmit = async (e) => {
+        setvisible(true)
         e.preventDefault();
         try {
             const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/auth/register`, {
@@ -64,6 +68,7 @@ export const Register = ({ loggedIn, setloggedIn }) => {
             if (response.token) {
                 localStorage.setItem("user", JSON.stringify(response))
                 setloggedIn(true)
+                setvisible(false)
                 toast.success("Success", {
                     position: "top-left",
                     autoClose: 5000,
@@ -78,6 +83,7 @@ export const Register = ({ loggedIn, setloggedIn }) => {
                     navigate("/home")
                 }, 1000);
             } else {
+                setvisible(false)
                 toast.error(response.message, {
                     position: "top-left",
                     autoClose: 3000,
@@ -156,7 +162,7 @@ export const Register = ({ loggedIn, setloggedIn }) => {
                             />
                         </Grid>
                     </Grid>
-                    <Button
+                    {!visible && <Button
                         type="submit"
                         fullWidth
                         variant="contained"
@@ -165,7 +171,8 @@ export const Register = ({ loggedIn, setloggedIn }) => {
                         onClick={handleSubmit}
                     >
                         Sign Up
-                    </Button>
+                    </Button>}
+                    {visible && <Loading size={35}/>}
                     <Grid container justifyContent="flex-end">
                         <Grid item>
                             <Link onClick={() => navigate("/")} style={{ cursor: "pointer" }} variant="body2">

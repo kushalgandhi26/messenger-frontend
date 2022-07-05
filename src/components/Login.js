@@ -12,6 +12,7 @@ import Container from '@material-ui/core/Container';
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Loading from './Loading';
 
 const useStyles = makeStyles((theme) => ({
     paper: {
@@ -39,6 +40,8 @@ export const Login = ({ loggedIn, setloggedIn }) => {
 
     const [loginData, setloginData] = useState({ email: "", password: "" })
 
+    const [visible, setvisible] = useState(false)
+
     const handleChange = (e) => {
         const { name, value } = e.target
         setloginData({ ...loginData, [name]: value })
@@ -49,6 +52,7 @@ export const Login = ({ loggedIn, setloggedIn }) => {
     }, [])
 
     const handleSubmit = async (e) => {
+        setvisible(true)
         e.preventDefault();
         try {
             const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/auth/login`, {
@@ -62,6 +66,7 @@ export const Login = ({ loggedIn, setloggedIn }) => {
             if (response.token) {
                 localStorage.setItem("user", JSON.stringify(response))
                 setloggedIn(true)
+                setvisible(false)
                 toast.success("Success", {
                     position: "top-left",
                     autoClose: 5000,
@@ -76,6 +81,7 @@ export const Login = ({ loggedIn, setloggedIn }) => {
                     navigate("/home")
                 }, 1000);
             } else {
+                setvisible(false)
                 toast.error(response.message, {
                     position: "top-left",
                     autoClose: 3000,
@@ -138,7 +144,7 @@ export const Login = ({ loggedIn, setloggedIn }) => {
                         onChange={(e) => handleChange(e)}
                         autoComplete="current-password"
                     />
-                    <Button
+                    {!visible && <Button
                         type="submit"
                         fullWidth
                         variant="contained"
@@ -147,7 +153,8 @@ export const Login = ({ loggedIn, setloggedIn }) => {
                         onClick={handleSubmit}
                     >
                         Sign In
-                    </Button>
+                    </Button>}
+                    {visible && <Loading size={35}/>}
                     <Grid container>
                         <Grid item xs>
                             <Link href="#" variant="body2">

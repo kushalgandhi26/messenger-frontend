@@ -26,6 +26,7 @@ import ListItemText from '@material-ui/core/ListItemText';
 import Welcome from './Welcome';
 import Chatcontainer from './Chatcontainer';
 import { io } from "socket.io-client"
+import Loading from './Loading';
 
 const drawerWidth = 240;
 
@@ -282,11 +283,12 @@ export default function Home({ loggedIn, setloggedIn }) {
           </IconButton>
         </div>
         <Divider />
+        {allusers.length === 0 && <Loading size={25}/>}
         {allusers.map((element) => {
           return (
             <ListItem onClick={() => selectUser(element)} key={element._id} button>
               <ListItemIcon>
-                <Avatar style={{background:"steelblue"}} alt={element.name} src="/static/images/avatar/1.jpg" className={classes.small} />
+                <Avatar style={{background:"steelblue"}} alt={element.name.charAt(0).toUpperCase()} src="/static/images/avatar/1.jpg" className={classes.small} />
               </ListItemIcon>
               <ListItemText primary={element.name} />
             </ListItem>
